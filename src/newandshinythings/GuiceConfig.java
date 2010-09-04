@@ -3,6 +3,10 @@ package newandshinythings;
 import java.util.HashMap;
 import java.util.Map;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.http.AccessToken;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -20,6 +24,18 @@ public class GuiceConfig extends GuiceServletContextListener {
 		return Guice.createInjector(new ServletModule() {
 			@Override
 			protected void configureServlets() {
+				//TODO Replace with ProvidersO
+				TwitterFactory twitterFactory = new TwitterFactory();
+			
+				String consumerKey = "GVjNjNVxiWWIRMsj6NH5A";
+				String consumerSecret = "fRRsZL42qAxnKmrv2PkzQXaT9r0KLTJbjIwKXxh07IU";
+				String token = "186786197-59kXltM4xdLoUbhBg8WbzwG0cdl8wlZugNLeJ9gN";
+				String tokenSecret = "IpBejWRMFJq1B0N9tV89tBpwN3Ho1kU8krIaJNmZ2UU";
+				AccessToken accessToken = new AccessToken(token, tokenSecret);
+				Twitter twitter = twitterFactory.getOAuthAuthorizedInstance(consumerKey, consumerSecret, accessToken);
+				bind(Twitter.class).toInstance(twitter);
+				bind(TwitterService.class);
+				
 				ScbFileParser p = new ScbFileParser();
 				bind(MyndighetsRegister.class).toInstance(p.parse());
 				bind(MyndighetsResource.class);
