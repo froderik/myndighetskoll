@@ -15,12 +15,14 @@ public class GuiceConfig extends GuiceServletContextListener {
 	@Override
 	protected Injector getInjector() {
 		final Map<String, String> params = new HashMap<String, String>();
-		params.put(PackagesResourceConfig.PROPERTY_PACKAGES,
-				"newandshinythings");
+		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "newandshinythings");
 
 		return Guice.createInjector(new ServletModule() {
 			@Override
 			protected void configureServlets() {
+				
+				bind(MyndighetsResource.class);
+				
 				serve("/*").with(GuiceContainer.class, params);
 			}
 		});
