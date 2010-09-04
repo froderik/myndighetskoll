@@ -20,7 +20,8 @@ public class GuiceConfig extends GuiceServletContextListener {
 		return Guice.createInjector(new ServletModule() {
 			@Override
 			protected void configureServlets() {
-				
+				ScbFileParser p = new ScbFileParser();
+				bind(MyndighetsRegister.class).toInstance(p.parse());
 				bind(MyndighetsResource.class);
 				
 				serve("/*").with(GuiceContainer.class, params);

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 
 public class ScbFileParser {
-	public MyndighetsRegister parse() throws IOException {
+	public MyndighetsRegister parse(){
 		// TODO : läs från livekällan
 		InputStream is = null;
 		try {
@@ -23,6 +23,8 @@ public class ScbFileParser {
 				register.add(enMyndighet);
 			}
 			return register;
+		} catch(IOException e) {
+			throw new IllegalStateException(e);
 		} finally {
 			if (is != null) {
 				try {
