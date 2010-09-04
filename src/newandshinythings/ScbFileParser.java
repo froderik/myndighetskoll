@@ -7,11 +7,11 @@ import java.io.LineNumberReader;
 
 public class ScbFileParser {
 	public MyndighetsRegister parse(){
-		// TODO : läs från livekällan
+		// TODO : l√§s fr√•n livek√§llan
 		InputStream is = null;
 		try {
 			is = getClass().getResourceAsStream("myndighetsregistret.txt");
-			InputStreamReader isr = new InputStreamReader(is);
+			InputStreamReader isr = new InputStreamReader(is, "UTF-8");
 			LineNumberReader lnr = new LineNumberReader(isr);
 
 			String currentLine = lnr.readLine(); // skip first line

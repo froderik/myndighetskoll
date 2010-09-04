@@ -13,7 +13,7 @@ public class MyndighetsRegister {
 	protected MyndighetsRegister(){}
 	
 	
-	// TODO : använd lucene för att söka
+	// TODO : anv√§nd lucene f√∂r att s√∂ka
 	public Myndighet findByName(String namn){
 		for (Myndighet enMyndighet : myndigheter) {
 			if(enMyndighet.getNamn().equalsIgnoreCase(namn)){
