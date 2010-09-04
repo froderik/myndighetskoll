@@ -41,12 +41,16 @@ public class ScbFileParser {
 		myndighet.setEpost(get(10,parts));
 		myndighet.setTel(get(8,parts));
 		myndighet.setFax(get(9,parts));
+		myndighet.setPostAdress(get(2,3,4,parts));
+		myndighet.setBesoksAdress(get(5,6,7,parts));
 		return myndighet;
 	}
 	
-	private String get(int index, String[] parts){
-		if(index >= parts.length) return null; return nullify(parts[index]);
+	private Adress get(int adressIndex, int postnrIndex, int postortIndex, String[] parts){
+		return new Adress(get(adressIndex,parts), get(postnrIndex,parts), get(postortIndex,parts));
 	}
 	
-	private String nullify(String s){ if(s.length() == 0) return null; return s;}
+	private String get(int index, String[] parts){
+		return index >= parts.length ? "" : parts[index];
+	}
 }

@@ -55,7 +55,7 @@ public class ScbFileParserTest {
 	
 	@Test
 	public void skatteverketsBesoksadress(){
-		assertAdress("SOLNA STRANDV€G 10", "171 54", "SOLNA", skatteverket.getPostAdress());
+		assertAdress("SOLNA STRANDV€G 10", "171 54", "SOLNA", skatteverket.getBesoksAdress());
 	}
 
 	private void assertAdress(String postadress, 
