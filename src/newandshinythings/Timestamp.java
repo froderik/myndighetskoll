@@ -20,7 +20,7 @@ public class Timestamp {
 	
 	public long getMillis(){ return this.millis;}
 
-	public void setNow() {
-		this.millis = System.currentTimeMillis();
+	public void setMillis(long millis) {
+		this.millis = millis;
 	}
 }

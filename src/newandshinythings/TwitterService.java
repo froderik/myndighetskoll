@@ -40,28 +40,32 @@ public class TwitterService {
 		long newest = lastTimeSaved.getMillis();
 
 		LOG.info("Found " + mentions.size() + " mentions");
-		for (Status status : mentions) {
-			long mentionTime = status.getCreatedAt().getTime();
-			if(mentionTime < lastTimeSaved.getMillis())
-			{
-				if(mentionTime > newest){
-					newest = mentionTime;
-				}
-				String text = status.getText();
-				LOG.info("Mentioned: " + text);
-				if(text.startsWith(ourName)){
-					text = text.substring(ourName.length());
-					String[] split = text.split(":");
-					String searchedName = split[0].trim();
-					Myndighet myndighet = register.findByName(searchedName);
-					if (myndighet != null && split.length > 1) {
-						String query = split[1].trim();
-						parseQueryAndSendUpdate(status, myndighet, query);
+		try{
+			for (Status status : mentions) {
+				long mentionTime = status.getCreatedAt().getTime();
+				if(mentionTime >= lastTimeSaved.getMillis())
+				{
+					if(mentionTime > newest){
+						newest = mentionTime;
+					}
+					String text = status.getText();
+					LOG.info("Mentioned: " + text);
+					if(text.startsWith(ourName)){
+						text = text.substring(ourName.length());
+						String[] split = text.split(":");
+						String searchedName = split[0].trim();
+						Myndighet myndighet = register.findByName(searchedName);
+						if (myndighet != null && split.length > 1) {
+							String query = split[1].trim();
+							parseQueryAndSendUpdate(status, myndighet, query);
+						}
 					}
 				}
 			}
+		} finally {
+			lastTimeSaved.setMillis(newest);
+			pm.makePersistent(lastTimeSaved);
 		}
-		pm.makePersistent(lastTimeSaved);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -117,13 +121,13 @@ public class TwitterService {
 
 	private StringBuilder addOrgNummer(StringBuilder builder, Myndighet myndighet) {
 		builder.append(", orgno: ");
-		builder.append(myndighet.getUrl());
+		builder.append(myndighet.getOrgnr());
 		return builder;
 	}
 
 	private StringBuilder addFax(StringBuilder builder, Myndighet myndighet) {
 		builder.append(", fax: ");
-		builder.append(myndighet.getUrl());
+		builder.append(myndighet.getFax());
 		return builder;
 	}
 
