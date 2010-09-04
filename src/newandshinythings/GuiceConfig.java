@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -43,9 +43,9 @@ public class GuiceConfig extends GuiceServletContextListener {
 				bind(MyndighetsRegister.class).toInstance(p.parse());
 				bind(MyndighetsResource.class);
 				
-				PersistenceManager pm = 
-					JDOHelper.getPersistenceManagerFactory("transactions-optional").getPersistenceManager();
-				bind(PersistenceManager.class).toInstance(pm);
+				PersistenceManagerFactory pmf = 
+					JDOHelper.getPersistenceManagerFactory("transactions-optional");
+				bind(PersistenceManagerFactory.class).toInstance(pmf);
 
 				
 				serve("/*").with(GuiceContainer.class, params);

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import twitter4j.ResponseList;
@@ -19,18 +20,18 @@ public class TwitterService {
 
 	private final Twitter twitter;
 	private final MyndighetsRegister register;
-	private final PersistenceManager pm;
+	private final PersistenceManagerFactory pmf;
 
 	private final String ourName = "@myndighetskoll";
 
 	@Inject
 	public TwitterService(Twitter twitter,
 						  MyndighetsRegister register,
-						  PersistenceManager pm)
+						  PersistenceManagerFactory pmf)
 	{
 		this.twitter = twitter;
 		this.register = register;
-		this.pm = pm;
+		this.pmf = pmf;
 	}
 
 	public void update() throws TwitterException {
@@ -43,7 +44,7 @@ public class TwitterService {
 		try{
 			for (Status status : mentions) {
 				long mentionTime = status.getCreatedAt().getTime();
-				if(mentionTime >= lastTimeSaved.getMillis())
+				if(mentionTime > lastTimeSaved.getMillis())
 				{
 					if(mentionTime > newest){
 						newest = mentionTime;
@@ -64,12 +65,22 @@ public class TwitterService {
 			}
 		} finally {
 			lastTimeSaved.setMillis(newest);
+			saveTimestamp(lastTimeSaved);
+		}
+	}
+
+	private void saveTimestamp(Timestamp lastTimeSaved) {
+		PersistenceManager pm = pmf.getPersistenceManager();
+		try {
 			pm.makePersistent(lastTimeSaved);
+		} finally {
+			pm.close();
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	private Timestamp getTimestamp(){
+		PersistenceManager pm = pmf.getPersistenceManager();
 		Query q = pm.newQuery(Timestamp.class);
 		try{
 			List<Timestamp> tidLista = (List<Timestamp>) q.execute();
@@ -80,6 +91,7 @@ public class TwitterService {
 			return tidLista.get(0);
 		} finally {
 			q.closeAll();
+			pm.close();
 		}
 	}
 
