@@ -1,6 +1,10 @@
 package newandshinythings;
 
+import java.util.List;
 import java.util.logging.Logger;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -15,35 +19,63 @@ public class TwitterService {
 
 	private final Twitter twitter;
 	private final MyndighetsRegister register;
+	private final PersistenceManager pm;
 
 	private final String ourName = "@myndighetskoll";
 
 	@Inject
 	public TwitterService(Twitter twitter,
-						  MyndighetsRegister register)
+						  MyndighetsRegister register,
+						  PersistenceManager pm)
 	{
 		this.twitter = twitter;
 		this.register = register;
+		this.pm = pm;
 	}
 
 	public void update() throws TwitterException {
 
 		ResponseList<Status> mentions = twitter.getMentions();
+		Timestamp lastTimeSaved = getTimestamp();
+		long newest = lastTimeSaved.getMillis();
 
 		LOG.info("Found " + mentions.size() + " mentions");
 		for (Status status : mentions) {
-			String text = status.getText();
-			LOG.info("Mentioned: " + text);
-			if(text.startsWith(ourName)){
-				text = text.substring(ourName.length());
-				String[] split = text.split(":");
-				String searchedName = split[0].trim();
-				Myndighet myndighet = register.findByName(searchedName);
-				if (myndighet != null && split.length > 1) {
-					String query = split[1].trim();
-					parseQueryAndSendUpdate(status, myndighet, query);
+			long mentionTime = status.getCreatedAt().getTime();
+			if(mentionTime < lastTimeSaved.getMillis())
+			{
+				if(mentionTime > newest){
+					newest = mentionTime;
+				}
+				String text = status.getText();
+				LOG.info("Mentioned: " + text);
+				if(text.startsWith(ourName)){
+					text = text.substring(ourName.length());
+					String[] split = text.split(":");
+					String searchedName = split[0].trim();
+					Myndighet myndighet = register.findByName(searchedName);
+					if (myndighet != null && split.length > 1) {
+						String query = split[1].trim();
+						parseQueryAndSendUpdate(status, myndighet, query);
+					}
 				}
 			}
+		}
+		pm.makePersistent(lastTimeSaved);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Timestamp getTimestamp(){
+		Query q = pm.newQuery(Timestamp.class);
+		try{
+			List<Timestamp> tidLista = (List<Timestamp>) q.execute();
+			if(tidLista.size() == 0)
+			{
+				return new Timestamp(0);
+			}
+			return tidLista.get(0);
+		} finally {
+			q.closeAll();
 		}
 	}
 

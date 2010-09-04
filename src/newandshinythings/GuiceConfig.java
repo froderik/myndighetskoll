@@ -3,6 +3,9 @@ package newandshinythings;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.http.AccessToken;
@@ -39,6 +42,11 @@ public class GuiceConfig extends GuiceServletContextListener {
 				ScbFileParser p = new ScbFileParser();
 				bind(MyndighetsRegister.class).toInstance(p.parse());
 				bind(MyndighetsResource.class);
+				
+				PersistenceManager pm = 
+					JDOHelper.getPersistenceManagerFactory("transactions-optional").getPersistenceManager();
+				bind(PersistenceManager.class).toInstance(pm);
+
 				
 				serve("/*").with(GuiceContainer.class, params);
 			}
