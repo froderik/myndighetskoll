@@ -37,4 +37,13 @@ public class Adress {
 	public void setPostOrt(String postOrt) {
 		this.postOrt = postOrt;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder(postAdress);
+		builder.append(", ").append(postNummer);
+		builder.append(" ").append(postOrt);
+
+		return builder.toString();
+	}
 }

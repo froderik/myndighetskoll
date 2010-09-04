@@ -43,13 +43,28 @@ public class TwitterService {
 				Myndighet myndighet = register.findByName(searchedName);
 				if (myndighet != null && split.length > 1) {
 					String query = split[1].trim();
-					if("epost".equalsIgnoreCase(query)){
-						LOG.info("Answering epost query for " + myndighet.getNamn());
-						String update = myndighet.getNamn().toLowerCase() + " epost: " + myndighet.getEpost();
-						twitter.updateStatus(update, status.getId());
-					}
+					parseQueryAndSendUpdate(status, myndighet, query);
 				}
 			}
 		}
+	}
+
+	private void parseQueryAndSendUpdate(Status status, Myndighet myndighet, String query)
+	throws TwitterException
+	{
+		StringBuilder builder = new StringBuilder("@");
+		builder.append(status.getUser().getScreenName()).append(" ");
+		if("epost".equalsIgnoreCase(query) || "email".equalsIgnoreCase(query)){
+			LOG.info("Answering epost query for " + myndighet.getNamn());
+			builder.append(myndighet.getNamn().toLowerCase()).append(" epost: ");
+			builder.append(myndighet.getEpost());
+		} else if("adress".equalsIgnoreCase(query) || "address".equalsIgnoreCase(query)){
+			LOG.info("Answering address query for " + myndighet.getNamn());
+			builder.append(myndighet.getNamn().toLowerCase()).append(" adress: ");
+			builder.append(myndighet.getBesoksAdress()).append(", ");
+			builder.append(myndighet.getPostAdress()).append("");
+			builder.append("");
+		}
+		twitter.updateStatus(builder.toString(), status.getId());
 	}
 }
