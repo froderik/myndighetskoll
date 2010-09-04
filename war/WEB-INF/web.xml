@@ -4,15 +4,19 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-	<servlet>
-		<servlet-name>Newandshinythings</servlet-name>
-		<servlet-class>newandshinythings.NewandshinythingsServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Newandshinythings</servlet-name>
-		<url-pattern>/newandshinythings</url-pattern>
-	</servlet-mapping>
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-	</welcome-file-list>
+
+	<listener>
+  		<listener-class>newandshinythings.GuiceConfig</listener-class>
+	</listener>
+
+	<filter>
+  		<filter-name>guiceFilter</filter-name>
+  		<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+	</filter>
+ 
+	<filter-mapping>
+  		<filter-name>guiceFilter</filter-name>
+  		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 </web-app>
