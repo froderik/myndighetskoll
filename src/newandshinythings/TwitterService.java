@@ -1,15 +1,13 @@
 package newandshinythings;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+
+import com.google.inject.Inject;
 
 public class TwitterService {
 
@@ -54,17 +52,70 @@ public class TwitterService {
 	{
 		StringBuilder builder = new StringBuilder("@");
 		builder.append(status.getUser().getScreenName()).append(" ");
+		builder.append(myndighet.getNamn().toLowerCase());
 		if("epost".equalsIgnoreCase(query) || "email".equalsIgnoreCase(query)){
 			LOG.info("Answering epost query for " + myndighet.getNamn());
-			builder.append(myndighet.getNamn().toLowerCase()).append(" epost: ");
-			builder.append(myndighet.getEpost());
+			builder = addEmail(builder, myndighet);
 		} else if("adress".equalsIgnoreCase(query) || "address".equalsIgnoreCase(query)){
 			LOG.info("Answering address query for " + myndighet.getNamn());
-			builder.append(myndighet.getNamn().toLowerCase()).append(" adress: ");
-			builder.append(myndighet.getBesoksAdress()).append(", ");
-			builder.append(myndighet.getPostAdress()).append("");
-			builder.append("");
+			builder = addPostAddress(builder, myndighet);
+		} else if("besoksaddress".equalsIgnoreCase(query)){
+			LOG.info("Answering address query for " + myndighet.getNamn());
+			builder = addBesoksAddress(builder, myndighet);
+		} else if("hemsida".equalsIgnoreCase(query) || "site".equalsIgnoreCase(query)){
+			LOG.info("Answering site query for " + myndighet.getNamn());
+			builder = addSite(builder, myndighet);
+		} else if("fax".equalsIgnoreCase(query)){
+			LOG.info("Answering fax query for " + myndighet.getNamn());
+			builder = addFax(builder, myndighet);
+		} else if("orgno".equalsIgnoreCase(query) || "ssn".equalsIgnoreCase(query)){
+			LOG.info("Answering ssn query for " + myndighet.getNamn());
+			builder = addOrgNummer(builder, myndighet);
+		}else if("all".equalsIgnoreCase(query)){
+			LOG.info("Answering all query for " + myndighet.getNamn());
+			builder = addEmail(builder, myndighet);
+			builder = addPostAddress(builder, myndighet);
+			builder = addBesoksAddress(builder, myndighet);
+			builder = addSite(builder, myndighet);
+			builder = addFax(builder, myndighet);
+			builder = addOrgNummer(builder, myndighet);
 		}
 		twitter.updateStatus(builder.toString(), status.getId());
+	}
+
+	private StringBuilder addOrgNummer(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", orgno: ");
+		builder.append(myndighet.getUrl());
+		return builder;
+	}
+
+	private StringBuilder addFax(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", fax: ");
+		builder.append(myndighet.getUrl());
+		return builder;
+	}
+
+	private StringBuilder addSite(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", site: ");
+		builder.append(myndighet.getUrl());
+		return builder;
+	}
+
+	private StringBuilder addPostAddress(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", adress: ");
+		builder.append(myndighet.getPostAdress());
+		return builder;
+	}
+
+	private StringBuilder addBesoksAddress(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", adress: ");
+		builder.append(myndighet.getBesoksAdress()).append(", ");
+		return builder;
+	}
+
+	private StringBuilder addEmail(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", epost: ");
+		builder.append(myndighet.getEpost());
+		return builder;
 	}
 }
