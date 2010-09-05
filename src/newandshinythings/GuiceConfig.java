@@ -38,15 +38,13 @@ public class GuiceConfig extends GuiceServletContextListener {
 				//TODO Replace with ProvidersO
 				TwitterFactory twitterFactory = new TwitterFactory();
 
-				String consumerKey = "GVjNjNVxiWWIRMsj6NH5A";
-				String consumerSecret = "fRRsZL42qAxnKmrv2PkzQXaT9r0KLTJbjIwKXxh07IU";
-				String token = "186786197-59kXltM4xdLoUbhBg8WbzwG0cdl8wlZugNLeJ9gN";
-				String tokenSecret = "IpBejWRMFJq1B0N9tV89tBpwN3Ho1kU8krIaJNmZ2UU";
-				
-				persistCredentials(pmf,consumerKey,consumerSecret,token,tokenSecret);
-				bind(TwitterAccountConfig.class).toInstance(loadAccountConfig(pmf));
-				AccessToken accessToken = new AccessToken(token, tokenSecret);
-				Twitter twitter = twitterFactory.getOAuthAuthorizedInstance(consumerKey, consumerSecret, accessToken);
+				TwitterAccountConfig accountConfig = loadAccountConfig(pmf);
+				bind(TwitterAccountConfig.class).toInstance(accountConfig);
+				AccessToken accessToken = new AccessToken(accountConfig.getToken(),
+														  accountConfig.getTokenSecret());
+				Twitter twitter = twitterFactory.getOAuthAuthorizedInstance(accountConfig.getConsumerKey(),
+																			accountConfig.getConsumerSecret(),
+																			accessToken);
 				bind(Twitter.class).toInstance(twitter);
 				bind(TwitterService.class);
 				
