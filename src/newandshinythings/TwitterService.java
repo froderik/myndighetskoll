@@ -116,6 +116,9 @@ public class TwitterService {
 		} else if("fax".equalsIgnoreCase(query)){
 			LOG.info("Answering fax query for " + myndighet.getNamn());
 			builder = addFax(builder, myndighet);
+		} else if("tel".equalsIgnoreCase(query) || "tfn".equalsIgnoreCase(query)){
+			LOG.info("Answering fax query for " + myndighet.getNamn());
+			builder = addTel(builder, myndighet);
 		} else if("orgno".equalsIgnoreCase(query) || "ssn".equalsIgnoreCase(query)){
 			LOG.info("Answering ssn query for " + myndighet.getNamn());
 			builder = addOrgNummer(builder, myndighet);
@@ -140,6 +143,12 @@ public class TwitterService {
 	private StringBuilder addFax(StringBuilder builder, Myndighet myndighet) {
 		builder.append(", fax: ");
 		builder.append(myndighet.getFax());
+		return builder;
+	}
+
+	private StringBuilder addTel(StringBuilder builder, Myndighet myndighet) {
+		builder.append(", Tel: ");
+		builder.append(myndighet.getTel());
 		return builder;
 	}
 
