@@ -9,6 +9,9 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.http.AccessToken;
@@ -35,7 +38,10 @@ public class GuiceConfig extends GuiceServletContextListener {
 					JDOHelper.getPersistenceManagerFactory("transactions-optional");
 				bind(PersistenceManagerFactory.class).toInstance(pmf);
 
-				//TODO Replace with ProvidersO
+				bind(Directory.class).to(RAMDirectory.class);
+				bind(LuceneStorage.class).asEagerSingleton();
+
+				//TODO Replace with Providers
 				TwitterFactory twitterFactory = new TwitterFactory();
 
 				TwitterAccountConfig accountConfig = loadAccountConfig(pmf);

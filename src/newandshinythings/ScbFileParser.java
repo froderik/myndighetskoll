@@ -6,6 +6,13 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 
 public class ScbFileParser {
+	
+	private final LuceneStorage storage;
+
+	public ScbFileParser(LuceneStorage storage) {
+		this.storage = storage;
+	}
+	
 	public MyndighetsRegister parse(){
 		// TODO : läs från livekällan
 		InputStream is = null;
@@ -15,7 +22,7 @@ public class ScbFileParser {
 			LineNumberReader lnr = new LineNumberReader(isr);
 
 			String currentLine = lnr.readLine(); // skip first line
-			MyndighetsRegister register = new MyndighetsRegister();
+			MyndighetsRegister register = new MyndighetsRegister(storage);
 			while (true) {
 				currentLine = lnr.readLine();
 				if(currentLine == null) break;

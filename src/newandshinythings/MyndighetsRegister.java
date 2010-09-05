@@ -6,11 +6,18 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.inject.Inject;
+
 @XmlRootElement
 public class MyndighetsRegister {
 	private List<Myndighet> myndigheter = new ArrayList<Myndighet>();
 	
-	protected MyndighetsRegister(){}
+	private final LuceneStorage storage;
+	
+	@Inject
+	protected MyndighetsRegister(LuceneStorage storage){
+		this.storage = storage;
+	}
 	
 	
 	// TODO : använd lucene för att söka
@@ -29,6 +36,7 @@ public class MyndighetsRegister {
 	
 	protected void add(Myndighet myndighet){
 		myndigheter.add(myndighet);
+		storage.addMyndighet(myndighet);
 	}
 	
 	@XmlElement(name="myndighet")
