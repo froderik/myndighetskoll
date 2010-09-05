@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Quirks Mode". Replacing this declaration     -->
+<!-- with a "Standards Mode" doctype is supported, -->
+<!-- but may lead to some differences in layout.   -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Myndighetskoll</title>
+  </head>
+
+  <body>
+    <h1>Myndighetskoll</h1>
+	<p><a href="http://www.twitter.com/myndighetskoll">@myndighetskoll</a> är en twitter bot som svarar på frågor om myndigheter.</p>
+	
+	<h2>Frågor man kan ställa</h2>
+	<ul>
+		<li>adress - returnerar myndighetens postadress</li>
+		<li>besoksadress - returnerar myndighetens besöksadress</li>
+		<li>hemsida - returnerar myndighetens hemsida</li>
+		<li>epost - returnerar myndighetens epost</li>
+		<li>tel - returnerar myndighetens telefonnummer</li>
+		<li>fax - returnerar myndighetens faxnummer</li>
+		<li>orgno - returnerar myndighetens organisationsnummer</li>
+	</ul>
+	
+	<h2>Hur frågar man?</h2>
+	<p>En fråga ställs genom att skriva myndighetens fulla namn följt av ett kolon och sen frågan. T ex "skatteverket : hemsida".</p>
+	
+	<h2>Datakälla</h2>
+	<p>Datat är hämtat från <a href="http://www.scb.se">Statistiska Centralbyråns</a> 
+	<a href="http://www.myndighetsregistret.scb.se/Myndighet.aspx">allmänna myndighetsregister</a>.</p>
+	
+	<h2>API</h2>
+	<p>Av bara farten blev det ett <a href="http://newandshinythings.appspot.com/myndighet/">XML-api</a> 
+	för datat vilket är mycket trevligare att läsa för maskiner än SCBs hemsida. Fritt att använda för den som vill.
+	För närvarande uppdateras inte datat så det är det aktuella läget 4:e september som returneras. 
+	</p>
+
+	<h2>Om</h2>
+	<p>Den första versionen av myndighetskoll kodades under codemocracy 4-5 september 2010 av Henrik Johansson och Fredrik
+	Rubensson. Koden finns på github - sök på myndighetskoll. Om du vill bidra gör en fork och skicka en patch till att börja 
+	med. Koden är skriven i Java med lite rest och DOI-stöd med hjälp av Jersey och Guice. Den snurrar i Google App Engine.</p>
+	
+	<h2>Kontakt</h2>
+	<p>Twittra med myndighetskoll eller skicka mail till 
+	<a href="mailto:newshinythings@googlegroups.com">newshinythings@googlegroups.com</a> så återkommer vi så snart vi kan.
+
+  </body>
+</html>
