@@ -1,10 +1,13 @@
 package newandshinythings;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Query;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -27,13 +30,21 @@ public class GuiceConfig extends GuiceServletContextListener {
 		return Guice.createInjector(new ServletModule() {
 			@Override
 			protected void configureServlets() {
+				
+				PersistenceManagerFactory pmf = 
+					JDOHelper.getPersistenceManagerFactory("transactions-optional");
+				bind(PersistenceManagerFactory.class).toInstance(pmf);
+
 				//TODO Replace with ProvidersO
 				TwitterFactory twitterFactory = new TwitterFactory();
-			
+
 				String consumerKey = "GVjNjNVxiWWIRMsj6NH5A";
 				String consumerSecret = "fRRsZL42qAxnKmrv2PkzQXaT9r0KLTJbjIwKXxh07IU";
 				String token = "186786197-59kXltM4xdLoUbhBg8WbzwG0cdl8wlZugNLeJ9gN";
 				String tokenSecret = "IpBejWRMFJq1B0N9tV89tBpwN3Ho1kU8krIaJNmZ2UU";
+				
+				persistCredentials(pmf,consumerKey,consumerSecret,token,tokenSecret);
+				bind(TwitterAccountConfig.class).toInstance(loadAccountConfig(pmf));
 				AccessToken accessToken = new AccessToken(token, tokenSecret);
 				Twitter twitter = twitterFactory.getOAuthAuthorizedInstance(consumerKey, consumerSecret, accessToken);
 				bind(Twitter.class).toInstance(twitter);
@@ -42,13 +53,37 @@ public class GuiceConfig extends GuiceServletContextListener {
 				ScbFileParser p = new ScbFileParser();
 				bind(MyndighetsRegister.class).toInstance(p.parse());
 				bind(MyndighetsResource.class);
-				
-				PersistenceManagerFactory pmf = 
-					JDOHelper.getPersistenceManagerFactory("transactions-optional");
-				bind(PersistenceManagerFactory.class).toInstance(pmf);
-
-				
+			
 				serve("/*").with(GuiceContainer.class, params);
+			}
+
+			@SuppressWarnings("unchecked")
+			private TwitterAccountConfig loadAccountConfig(
+					PersistenceManagerFactory pmf) {
+				PersistenceManager pm = pmf.getPersistenceManager();
+				Query q = pm.newQuery(TwitterAccountConfig.class);
+				try{
+					List<TwitterAccountConfig> accs = (List<TwitterAccountConfig>) q.execute();
+					if(!accs.isEmpty())
+					{
+						return accs.get(0);
+					}
+				} finally {
+					q.closeAll();
+					pm.close();
+				}
+				throw new IllegalStateException("Can't run without twitter account information!");
+			}
+
+			private void persistCredentials(PersistenceManagerFactory pmf,
+					String consumerKey, String consumerSecret, String token,
+					String tokenSecret) {
+				PersistenceManager pm = pmf.getPersistenceManager();
+				try {
+					pm.makePersistent(new TwitterAccountConfig(consumerKey,consumerSecret,token,tokenSecret));
+				} finally {
+					pm.close();
+				}
 			}
 		});
 	}
