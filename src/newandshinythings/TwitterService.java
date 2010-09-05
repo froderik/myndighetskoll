@@ -122,16 +122,10 @@ public class TwitterService {
 		} else if("orgno".equalsIgnoreCase(query) || "ssn".equalsIgnoreCase(query)){
 			LOG.info("Answering ssn query for " + myndighet.getNamn());
 			builder = addOrgNummer(builder, myndighet);
-		}else if("all".equalsIgnoreCase(query)){
-			LOG.info("Answering all query for " + myndighet.getNamn());
-			builder = addEmail(builder, myndighet);
-			builder = addPostAddress(builder, myndighet);
-			builder = addBesoksAddress(builder, myndighet);
-			builder = addSite(builder, myndighet);
-			builder = addFax(builder, myndighet);
-			builder = addOrgNummer(builder, myndighet);
 		}
-		twitter.updateStatus(builder.toString(), status.getId());
+		String message = builder.toString();
+		if(message.length() > 140) message = "vårt svar blev för långt - spana in datat direkt på http://bit.ly/bngRzQ";
+		twitter.updateStatus(message, status.getId());
 	}
 
 	private StringBuilder addOrgNummer(StringBuilder builder, Myndighet myndighet) {
