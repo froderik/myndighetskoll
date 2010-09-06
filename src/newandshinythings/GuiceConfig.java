@@ -66,14 +66,11 @@ public class GuiceConfig extends GuiceServletContextListener {
 					{
 						return accs.get(0);
 					}
-					persistCredentials(pmf, "GVjNjNVxiWWIRMsj6NH5A", "fRRsZL42qAxnKmrv2PkzQXaT9r0KLTJbjIwKXxh07IU", 
-							"186786197-59kXltM4xdLoUbhBg8WbzwG0cdl8wlZugNLeJ9gN", "IpBejWRMFJq1B0N9tV89tBpwN3Ho1kU8krIaJNmZ2UU");
-					return loadAccountConfig(pmf);
 				} finally {
 					q.closeAll();
 					pm.close();
 				}
-				//throw new IllegalStateException("Can't run without twitter account information!");
+				throw new IllegalStateException("Can't run without twitter account information!");
 			}
 
 			private void persistCredentials(PersistenceManagerFactory pmf,
