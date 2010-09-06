@@ -43,4 +43,16 @@ public class MyndighetsResource {
 			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GET
+	@Path("/retweet")
+	public String retweets(){
+		try{
+			twitter.retweet();
+			return "WIN";
+		} catch(Exception e){
+			LOG.log(Level.SEVERE, "Something went wrong! " + e.getMessage(), e);
+			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

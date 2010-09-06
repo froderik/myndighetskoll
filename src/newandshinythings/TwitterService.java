@@ -7,8 +7,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import twitter4j.QueryResult;
 import twitter4j.ResponseList;
 import twitter4j.Status;
+import twitter4j.Tweet;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
@@ -17,6 +19,7 @@ import com.google.inject.Inject;
 public class TwitterService {
 
 	private static final Logger LOG = Logger.getLogger(TwitterService.class.getName());
+	private static final long ANSWER_TIMESTAMP_PK = 1L;
 
 	private final Twitter twitter;
 	private final MyndighetsRegister register;
@@ -37,7 +40,7 @@ public class TwitterService {
 	public void update() throws TwitterException {
 
 		ResponseList<Status> mentions = twitter.getMentions();
-		Timestamp lastTimeSaved = getTimestamp();
+		Timestamp lastTimeSaved = getTimestamp(ANSWER_TIMESTAMP_PK);
 		long newest = lastTimeSaved.getMillis();
 
 		LOG.info("Found " + mentions.size() + " mentions");
@@ -65,28 +68,74 @@ public class TwitterService {
 			}
 		} finally {
 			lastTimeSaved.setMillis(newest);
-			saveTimestamp(lastTimeSaved);
+			save(lastTimeSaved);
 		}
 	}
+	
+	public void retweet() throws TwitterException {
+		List<Myndighet> alla = register.getMyndigheter();
 
-	private void saveTimestamp(Timestamp lastTimeSaved) {
+		for (Myndighet myndighet : alla) {
+			// TODO : put these in a task queue to make it more stable now
+			// all fails if one fails
+			String namn = myndighet.getNamn();
+			twitter4j.Query q = new twitter4j.Query(namn);
+			
+			QueryResult result = twitter.search(q);
+			List<Tweet> tweets = result.getTweets();
+			
+			Timestamp latestTimestamp = getTimestamp(myndighet.getOrgnrAsLong());
+			Long newTimestamp = latestTimestamp.getMillis();
+
+			try{
+				for (Tweet tweet : tweets) {
+					long tweetTimestamp = tweet.getCreatedAt().getTime();
+					if(tweetTimestamp > latestTimestamp.getMillis()){
+						boolean isFromUs = ourName.equalsIgnoreCase(tweet.getFromUser());
+						boolean isToUs = ourName.equalsIgnoreCase(tweet.getToUser());
+						if(!isFromUs && !isToUs)
+						{
+							// TODO : put twitter error handling centrally so all calls can benefit
+							try{
+								twitter.retweetStatus(tweet.getId());
+							} catch(TwitterException e) {
+								boolean notforbidden = e.getStatusCode() != 403;
+								if(e.exceededRateLimitation() || notforbidden) throw e; // add more cases here if needed
+							} finally {
+								if(tweetTimestamp > newTimestamp) newTimestamp = tweetTimestamp;
+							}
+						}
+					}
+				}
+			} finally {
+				latestTimestamp.setMillis(newTimestamp);
+				save(latestTimestamp);
+			}
+		}		
+	}
+	
+
+	private void save(Object o){
 		PersistenceManager pm = pmf.getPersistenceManager();
 		try {
-			pm.makePersistent(lastTimeSaved);
+			pm.makePersistent(o);
 		} finally {
 			pm.close();
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Timestamp getTimestamp(){
+	private Timestamp getTimestamp(Long primaryKey){
 		PersistenceManager pm = pmf.getPersistenceManager();
-		Query q = pm.newQuery(Timestamp.class);
-		try{
-			List<Timestamp> tidLista = (List<Timestamp>) q.execute();
-			if(tidLista.size() == 0)
-			{
-				return new Timestamp(0);
+		Query q = pm.newQuery("select from newandshinythings.Timestamp " +
+                "where primaryKey == primaryKeyParam " +
+                "parameters String primaryKeyParam ");
+		try {
+			List<Timestamp> tidLista = (List<Timestamp>) q.execute(primaryKey);
+			if(tidLista.size() == 0) {
+				return new Timestamp(primaryKey, 0);
+			} else if(tidLista.size() > 1) {
+				throw new IllegalStateException("There are more than one timestamp for the PK: " + primaryKey);
 			}
 			return tidLista.get(0);
 		} finally {

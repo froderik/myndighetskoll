@@ -9,12 +9,13 @@ public class Timestamp {
 	@SuppressWarnings("unused")
 	@PrimaryKey
 	@Persistent
-	private Long primaryKey = 1L;
+	private Long primaryKey;
 	
 	@Persistent
 	private long millis;
 	
-	public Timestamp(long millis){
+	public Timestamp(long primaryKey, long millis){
+		this.primaryKey = primaryKey;
 		this.millis = millis;
 	}
 	
