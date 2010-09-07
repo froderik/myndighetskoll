@@ -25,7 +25,7 @@ public class TwitterService {
 	private final MyndighetsRegister register;
 	private final PersistenceManagerFactory pmf;
 
-	private final String ourName = "@myndighetskoll";
+	public static final String OURNAME = "@myndighetskoll";
 
 	@Inject
 	public TwitterService(Twitter twitter,
@@ -54,8 +54,8 @@ public class TwitterService {
 					}
 					String text = status.getText();
 					LOG.info("Mentioned: " + text);
-					if(text.startsWith(ourName)){
-						text = text.substring(ourName.length());
+					if(text.startsWith(OURNAME)){
+						text = text.substring(OURNAME.length());
 						String[] split = text.split(":");
 						String searchedName = split[0].trim();
 						Myndighet myndighet = register.findByName(searchedName);
@@ -91,8 +91,8 @@ public class TwitterService {
 				for (Tweet tweet : tweets) {
 					long tweetTimestamp = tweet.getCreatedAt().getTime();
 					if(tweetTimestamp > latestTimestamp.getMillis()){
-						boolean isFromUs = ourName.equalsIgnoreCase(tweet.getFromUser());
-						boolean isToUs = ourName.equalsIgnoreCase(tweet.getToUser());
+						boolean isFromUs = OURNAME.equalsIgnoreCase(tweet.getFromUser());
+						boolean isToUs = OURNAME.equalsIgnoreCase(tweet.getToUser());
 						if(!isFromUs && !isToUs)
 						{
 							// TODO : put twitter error handling centrally so all calls can benefit
