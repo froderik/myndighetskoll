@@ -18,6 +18,10 @@ public class Myndighet {
 	public String getOrgnr() {
 		return orgnr;
 	}
+	public long getOrgnrAsLong() {
+		String[] parts = getOrgnr().split("-");
+		return Integer.parseInt(parts[0] + parts[1]);
+	}
 	public void setOrgnr(String orgnr) {
 		this.orgnr = orgnr;
 	}
