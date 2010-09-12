@@ -43,6 +43,7 @@ public class ScbFileParser {
 		myndighet.setEpost(get(10,parts));
 		myndighet.setTel(get(8,parts));
 		myndighet.setFax(get(9,parts));
+		myndighet.setUrl(get(11,parts));
 		myndighet.setPostAdress(get(2,3,4,parts));
 		myndighet.setBesoksAdress(get(5,6,7,parts));
 		return myndighet;
